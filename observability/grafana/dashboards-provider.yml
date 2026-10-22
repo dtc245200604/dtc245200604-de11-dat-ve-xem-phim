@@ -1,0 +1,11 @@
+apiVersion: 1
+providers:
+  - name: de11
+    orgId: 1
+    folder: Đề 11 - Đặt vé
+    type: file
+    disableDeletion: false
+    editable: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

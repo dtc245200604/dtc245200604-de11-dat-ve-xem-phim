@@ -1,0 +1,133 @@
+x-observability-logging: &observability-logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    user: "65534:65534"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=512MB
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    networks: [monitoring, tools]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    pids_limit: 100
+    logging: *observability-logging
+
+  grafana:
+    image: grafana/grafana:12.4.3
+    restart: unless-stopped
+    user: "472:472"
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      GF_SECURITY_COOKIE_SAMESITE: strict
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+    secrets: [grafana_password]
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml:ro
+      - ./observability/grafana/dashboards-provider.yml:/etc/grafana/provisioning/dashboards/default.yml:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks: [monitoring, tools]
+    depends_on: [prometheus]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    pids_limit: 150
+    logging: *observability-logging
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    restart: unless-stopped
+    user: "65534:65534"
+    command: [--nginx.scrape-uri=http://nginx:8082/stub_status]
+    networks: [monitoring]
+    depends_on: [nginx]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 64m
+    pids_limit: 50
+    logging: *observability-logging
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.20.0
+    restart: unless-stopped
+    user: "65534:65534"
+    command:
+      - --config.my-cnf=/run/secrets/mysqld_exporter_config
+      - --mysqld.address=mysql:3306
+      - --exporter.query_timeout=5
+    secrets: [mysqld_exporter_config]
+    networks: [database, monitoring]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 96m
+    pids_limit: 50
+    logging: *observability-logging
+
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.60.6
+    restart: unless-stopped
+    # Ngoại lệ: cAdvisor cần đọc cgroup, thiết bị và socket của Docker host.
+    privileged: true
+    cgroup: host
+    devices: [/dev/kmsg:/dev/kmsg]
+    command:
+      - --docker_only=true
+      - --housekeeping_interval=15s
+      - --containerd=/run/containerd/containerd.sock
+      # Docker factory đọc namespace moby; tránh containerd factory nhận trước và mất Compose labels.
+      - --containerd-namespace=k8s.io
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service
+      - --disable_metrics=disk,diskIO,percpu,sched,process,hugetlb,resctrl
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks: [monitoring]
+    mem_limit: 256m
+    pids_limit: 100
+    logging: *observability-logging
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+secrets:
+  grafana_password:
+    file: ./.local/secrets/grafana_password
+  mysqld_exporter_config:
+    file: ./.local/secrets/mysqld_exporter.cnf

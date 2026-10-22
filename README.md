@@ -24,20 +24,26 @@ Lần đầu script hỏi mật khẩu khởi tạo; cấu hình local được 
 | Website | http://localhost:8080 | Khách không cần tài khoản |
 | Admin | http://localhost:8080/admin | admin |
 | phpMyAdmin | http://localhost:8081 | cinema_admin |
+| Grafana | http://localhost:3001 | admin |
+| Prometheus | http://localhost:9090 | Local |
 
-Các mật khẩu do người vận hành nhập khi khởi tạo.
+Các mật khẩu do người vận hành nhập khi khởi tạo. Website công khai tại https://rapmay.nvdo.io.vn khi Tunnel đã kết nối.
 
 ## Kiểm thử và vận hành
 
 ```sh
 docker compose ps -a
 sh scripts/test.sh
+sh scripts/verify.sh
 sh scripts/backup.sh
 sh scripts/stop.sh
 ```
 
 Khôi phục dữ liệu: `sh scripts/restore.sh .local/backups/ten-file.sql`, cần xác nhận RESTORE. Dừng bình thường giữ volume. `docker compose down --volumes` xóa dữ liệu; không dùng khi chỉ muốn khởi động lại.
 
+## Giám sát
+
+Prometheus thu thập 5 job: prometheus, app, nginx, mysql, cadvisor. Grafana tự nạp dashboard. Chạy `sh scripts/verify.sh` để kiểm tra target, exporter và dữ liệu thật. Đợi ít nhất hai chu kỳ scrape.
 
 ## Cấu trúc
 

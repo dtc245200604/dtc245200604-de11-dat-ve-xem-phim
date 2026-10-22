@@ -1,0 +1,32 @@
+groups:
+  - name: de11-dich-vu
+    rules:
+      - alert: DichVuKhongPhanHoi
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Dịch vụ {{ $labels.job }} không phản hồi"
+          description: "Prometheus không lấy được metrics từ {{ $labels.instance }} trong một phút."
+      - alert: MySQLKhongKetNoi
+        expr: mysql_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Exporter không kết nối được MySQL"
+      - alert: NginxKhongKetNoi
+        expr: nginx_up == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Exporter không đọc được Nginx stub_status"
+      - alert: UngDungLoiMayChu
+        expr: sum(rate(cinema_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(cinema_http_requests_total[5m])), 0.001) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tỷ lệ HTTP 5xx vượt 5%"

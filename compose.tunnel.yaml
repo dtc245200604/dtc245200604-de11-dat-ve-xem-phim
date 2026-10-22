@@ -1,0 +1,24 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.0
+    profiles: [tunnel]
+    restart: unless-stopped
+    command: [tunnel, --no-autoupdate, run, --token-file, /run/secrets/cloudflare_tunnel_token]
+    secrets: [cloudflare_tunnel_token]
+    networks: [edge, tools]
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+  grafana:
+    environment:
+      GF_SERVER_ROOT_URL: https://grafana-rapmay.nvdo.io.vn
+      GF_SECURITY_COOKIE_SECURE: "true"
+secrets:
+  cloudflare_tunnel_token:
+    file: ./.local/secrets/cloudflare_tunnel_token

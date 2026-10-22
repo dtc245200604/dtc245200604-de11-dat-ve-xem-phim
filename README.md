@@ -41,9 +41,22 @@ sh scripts/stop.sh
 
 Khôi phục dữ liệu: `sh scripts/restore.sh .local/backups/ten-file.sql`, cần xác nhận RESTORE. Dừng bình thường giữ volume. `docker compose down --volumes` xóa dữ liệu; không dùng khi chỉ muốn khởi động lại.
 
-## Giám sát
+## Giám sát và log
 
-Prometheus thu thập 5 job: prometheus, app, nginx, mysql, cadvisor. Grafana tự nạp dashboard. Chạy `sh scripts/verify.sh` để kiểm tra target, exporter và dữ liệu thật. Đợi ít nhất hai chu kỳ scrape.
+Prometheus có 5 job: prometheus, app, nginx, mysql, cadvisor. Grafana tự nạp datasource và dashboard **Đề 11 | Tổng quan vận hành**. Đợi ít nhất hai chu kỳ scrape để biểu đồ CPU có mẫu. Script verify kiểm tra target, exporter và dữ liệu container thật.
+
+Trong Grafana Explore chọn Loki, tạo một đơn đặt vé, một thanh toán thất bại và truy cập đường dẫn không tồn tại trước khi chạy:
+
+```logql
+{project="de11datvewsl",service="app"} | json | event="booking_created"
+
+{project="de11datvewsl",service="nginx",stream="access"} | json | status >= 400
+
+sum(count_over_time({project="de11datvewsl",service="app"} | json | event="payment_failed" [5m]))
+```
+
+`sh scripts/verify.sh --logs` xác minh cả ba truy vấn. Promtail đọc volume log chỉ đọc và lưu positions; Loki giữ log 7 ngày. Promtail được sử dụng theo công cụ yêu cầu của đề thực hành.
+
 
 ## Cấu trúc
 

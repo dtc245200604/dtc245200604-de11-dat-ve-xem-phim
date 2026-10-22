@@ -1,0 +1,74 @@
+x-central-logging: &central-logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+
+services:
+  log-storage-init:
+    image: alpine:3.23.3
+    user: "0:0"
+    command: [sh, -ec, "mkdir -p /loki /positions; chown 10001:10001 /loki /positions; chmod 0750 /loki /positions"]
+    volumes:
+      - loki_data:/loki
+      - promtail_positions:/positions
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER]
+    security_opt: [no-new-privileges:true]
+    logging: *central-logging
+
+  loki:
+    image: grafana/loki:3.7.8
+    restart: unless-stopped
+    user: "10001:10001"
+    command: [-config.file=/etc/loki/config.yml]
+    volumes:
+      - ./observability/loki/config.yml:/etc/loki/config.yml:ro
+      - loki_data:/loki
+    networks: [monitoring]
+    depends_on:
+      log-storage-init:
+        condition: service_completed_successfully
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    pids_limit: 100
+    logging: *central-logging
+
+  promtail:
+    # Đề thực hành yêu cầu Promtail; công cụ đã EOL từ 02/03/2026.
+    image: grafana/promtail:3.5.11
+    restart: unless-stopped
+    user: "10001:10001"
+    command: [-config.file=/etc/promtail/config.yml]
+    volumes:
+      - ./observability/promtail/config.yml:/etc/promtail/config.yml:ro
+      - promtail_positions:/var/lib/promtail
+      - app_logs:/var/log/app:ro
+      - nginx_logs:/var/log/nginx:ro
+      - mysql_logs:/var/log/mysql:ro
+    networks: [monitoring]
+    depends_on:
+      log-storage-init:
+        condition: service_completed_successfully
+      loki:
+        condition: service_started
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 100
+    logging: *central-logging
+
+  grafana:
+    volumes:
+      - ./observability/grafana/loki-datasource.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
+
+volumes:
+  loki_data:
+  promtail_positions:

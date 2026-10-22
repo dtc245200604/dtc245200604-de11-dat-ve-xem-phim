@@ -1,0 +1,48 @@
+<%- include('partials/header', {title: 'Lịch chiếu & đặt vé', active: 'movies'}) %>
+<main id="noi-dung">
+  <section class="hero container">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="tiny-square" aria-hidden="true"></span> NHỮNG CÂU CHUYỆN ĐANG CHỜ BẠN</span>
+      <h1>Chọn phim hay.<br>Giữ chỗ yêu thích.</h1>
+      <p>Rời nhịp phố một chút, bước vào một thế giới khác. Tìm suất chiếu phù hợp và chọn ngay chỗ ngồi của bạn.</p>
+      <div class="hero-actions"><a class="button" href="#lich-chieu">Xem lịch chiếu <span aria-hidden="true">↗</span></a><a class="text-link" href="#phim-dang-chieu">Khám phá phim <span aria-hidden="true">→</span></a></div>
+      <div class="hero-caption"><span class="caption-number">01</span><span>PHÒNG CHIẾU<br><strong>48 chỗ ngồi cho mỗi câu chuyện</strong></span></div>
+    </div>
+    <% const featured = movies[0]; if (featured) { %>
+      <a href="/movies/<%= featured.id %>" class="hero-feature" aria-label="Xem phim <%= featured.title %>">
+        <div class="hero-poster"><img src="/images/posters/<%= featured.posterKey %>.svg" alt="Áp phích phim <%= featured.title %>" width="600" height="800"><span class="feature-label">ĐANG CHIẾU</span></div>
+        <div class="feature-description"><div><span class="eyebrow">GỢI Ý HÔM NAY</span><h2><%= featured.title %></h2><span><%= featured.genre %> <span aria-hidden="true">·</span> <%= featured.durationMinutes %> phút</span></div><span class="circle-arrow" aria-hidden="true">↗</span></div>
+      </a>
+    <% } else { %><div class="hero-empty"><span class="brand-mark">M<span>·</span></span><p>Những câu chuyện mới sẽ sớm lên màn ảnh.</p></div><% } %>
+  </section>
+
+  <section class="section container" id="phim-dang-chieu">
+    <div class="section-heading"><div><span class="eyebrow">LÊN MÀN ẢNH</span><h2>Phim đang chiếu</h2></div><span class="section-counter"><%= String(movies.length).padStart(2, '0') %> bộ phim</span></div>
+    <% if (!movies.length) { %><div class="empty-state"><h3>Chưa có phim đang chiếu</h3><p>Lịch phim mới sẽ được cập nhật tại đây.</p></div><% } %>
+    <div class="movie-grid">
+      <% movies.forEach(function(movie) { %>
+        <article class="movie-card"><a class="movie-poster" href="/movies/<%= movie.id %>"><img src="/images/posters/<%= movie.posterKey %>.svg" alt="Áp phích phim <%= movie.title %>" width="600" height="800" loading="lazy"><span class="poster-link">Xem thông tin <span aria-hidden="true">↗</span></span></a><div class="movie-card-info"><p class="movie-genre"><%= movie.genre %></p><h3><a href="/movies/<%= movie.id %>"><%= movie.title %></a></h3><div class="movie-card-bottom"><span><%= movie.durationMinutes %> phút</span><a href="/movies/<%= movie.id %>#suat-chieu" class="text-link">Đặt vé <span aria-hidden="true">→</span></a></div></div></article>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class="schedule-section" id="lich-chieu">
+    <div class="container section">
+      <div class="section-heading"><div><span class="eyebrow">LÊN KẾ HOẠCH CHO BUỔI XEM PHIM</span><h2>Lịch chiếu</h2></div><p>Giờ chiếu theo giờ Việt Nam</p></div>
+      <nav class="date-list" aria-label="Chọn ngày xem phim">
+        <% dates.forEach(function(date) { const day = new Date(date + 'T12:00:00+07:00'); const weekday = new Intl.DateTimeFormat('vi-VN', {weekday:'short',timeZone:'Asia/Ho_Chi_Minh'}).format(day); const dayLabel = new Intl.DateTimeFormat('vi-VN', {day:'2-digit',month:'2-digit',timeZone:'Asia/Ho_Chi_Minh'}).format(day); %>
+          <a class="date-item <%= selectedDate === date ? 'is-selected' : '' %>" href="/?date=<%= date %>#lich-chieu" <%- selectedDate === date ? 'aria-current="date"' : '' %>><span><%= weekday %></span><strong><%= dayLabel %></strong></a>
+        <% }); %>
+      </nav>
+      <% const groups = new Map(); showtimes.forEach(function(s) { if (!groups.has(s.movieId)) groups.set(s.movieId, []); groups.get(s.movieId).push(s); }); %>
+      <div class="schedule-list">
+        <% groups.forEach(function(slots) { const film = slots[0]; %>
+          <article class="schedule-card"><a href="/movies/<%= film.movieId %>" class="schedule-poster"><img src="/images/posters/<%= film.posterKey %>.svg" alt="" width="600" height="800" loading="lazy"></a><div class="schedule-film"><span class="movie-genre"><%= film.genre %></span><h3><a href="/movies/<%= film.movieId %>"><%= film.title %></a></h3><p><%= film.durationMinutes %> phút <span aria-hidden="true">·</span> Phòng chiếu 01</p></div><div class="showtime-options"><% slots.forEach(function(slot) { %><a href="/showtimes/<%= slot.id %>/seats" class="showtime-pill" aria-label="Chọn suất <%= new Intl.DateTimeFormat('vi-VN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Ho_Chi_Minh'}).format(new Date(slot.startsAt)) %>, phim <%= slot.title %>"><strong><%= new Intl.DateTimeFormat('vi-VN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Ho_Chi_Minh'}).format(new Date(slot.startsAt)) %></strong><span><%= formatMoney(slot.price) %></span></a><% }); %></div></article>
+        <% }); %>
+        <% if (!showtimes.length) { %><div class="empty-state"><span class="empty-icon" aria-hidden="true">◷</span><h3>Chưa có suất chiếu trong ngày này</h3><p>Bạn có thể chọn một ngày khác để tìm suất chiếu phù hợp.</p></div><% } %>
+      </div>
+      <div class="schedule-note"><span aria-hidden="true">ⓘ</span><p>Chọn suất chiếu để xem sơ đồ ghế. Ghế được giữ tối đa 5 phút sau khi xác nhận đặt chỗ, kết thúc sớm nếu đến giờ chiếu.</p></div>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

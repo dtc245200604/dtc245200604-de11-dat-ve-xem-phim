@@ -1,0 +1,11 @@
+<%- include('partials/header', {title: movie.title, active: 'movies'}) %>
+<main id="noi-dung" class="container page-main">
+  <nav class="breadcrumb" aria-label="Đường dẫn"><a href="/">Trang chủ</a><span aria-hidden="true">/</span><span><%= movie.title %></span></nav>
+  <article class="movie-detail"><div class="detail-poster"><img src="/images/posters/<%= movie.posterKey %>.svg" alt="Áp phích phim <%= movie.title %>" width="600" height="800"></div><div class="detail-copy"><span class="eyebrow">PHIM ĐANG CHIẾU</span><h1><%= movie.title %></h1><div class="detail-meta"><span><%= movie.genre %></span><span><%= movie.durationMinutes %> phút</span><span>2D · Tiếng Việt</span></div><h2>Nội dung phim</h2><p class="movie-synopsis"><%= movie.description %></p><a class="button" href="#suat-chieu">Chọn suất chiếu <span aria-hidden="true">↓</span></a><p class="muted small-text">Tác phẩm hư cấu dùng trong hệ thống thực hành đặt vé.</p></div></article>
+  <section class="section detail-schedule" id="suat-chieu"><div class="section-heading"><div><span class="eyebrow">HẸN BẠN TẠI RẠP</span><h2>Suất chiếu sắp tới</h2></div></div>
+    <% const days = new Map(); showtimes.forEach(function(s) { const key = formatDate(s.startsAt); if (!days.has(key)) days.set(key, []); days.get(key).push(s); }); %>
+    <% days.forEach(function(slots, day) { %><div class="detail-showtime-row"><h3><%= day %></h3><div class="showtime-options"><% slots.forEach(function(slot) { %><a class="showtime-pill" href="/showtimes/<%= slot.id %>/seats"><strong><%= new Intl.DateTimeFormat('vi-VN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Ho_Chi_Minh'}).format(new Date(slot.startsAt)) %></strong><span><%= formatMoney(slot.price) %></span></a><% }); %></div></div><% }); %>
+    <% if (!showtimes.length) { %><div class="empty-state"><h3>Phim chưa có suất chiếu sắp tới</h3><p>Mời bạn xem thêm các bộ phim khác.</p><a class="button button-outline" href="/#lich-chieu">Xem lịch chiếu</a></div><% } %>
+  </section>
+</main>
+<%- include('partials/footer') %>

@@ -1,0 +1,11 @@
+.env
+.local/
+node_modules/
+output/
+docs/
+evidence/
+*.docx
+*.pdf
+*.zip
+*.sql.gz
+*.log

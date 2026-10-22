@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lịch chiếu phim, chọn ghế và đặt vé trực tuyến tại Rạp Mây.">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <title><%= typeof title !== 'undefined' ? title + ' · ' : '' %><%= siteName %></title>
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#noi-dung">Đến nội dung chính</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="<%= siteName %> — Trang chủ">
+        <span class="brand-mark" aria-hidden="true">M<span>·</span></span>
+        <span class="brand-name"><%= siteName %><small>Lịch chiếu và đặt vé trực tuyến</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Điều hướng chính">
+        <a href="/#phim-dang-chieu" class="<%= typeof active !== 'undefined' && active === 'movies' ? 'is-active' : '' %>">Phim đang chiếu</a>
+        <a href="/#lich-chieu" class="<%= typeof active !== 'undefined' && active === 'schedule' ? 'is-active' : '' %>">Lịch chiếu</a>
+        <a href="/history" class="nav-history <%= typeof active !== 'undefined' && active === 'history' ? 'is-active' : '' %>"><span aria-hidden="true">▤</span> Vé của tôi</a>
+      </nav>
+    </div>
+  </header>
+  <% if (flash) { const messages = Array.isArray(flash) ? flash : [flash]; messages.forEach(function(item) { const content = typeof item === 'string' ? item : (item.message || item.text || ''); if (content) { %>
+    <div class="container flash-wrap"><div class="notice <%= item.type === 'error' ? 'notice-error' : 'notice-success' %>" role="status"><%= content %></div></div>
+  <% } }); } %>

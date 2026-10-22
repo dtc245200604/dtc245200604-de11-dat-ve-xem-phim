@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-labelledby="title desc">
+  <title id="title">Mùa Nước Trong</title><desc id="desc">Áp phích minh họa ngôi nhà bên dòng sông, những hàng cây và chiếc thuyền dưới trời xanh dịu.</desc>
+  <rect width="600" height="800" fill="#dde1c7"/>
+  <rect x="23" y="23" width="554" height="754" fill="none" stroke="#a3b6a0"/>
+  <text x="300" y="63" text-anchor="middle" fill="#647e68" font-family="Arial,sans-serif" font-size="10" letter-spacing="4">MỘT CÂU CHUYỆN TỪ RẠP MÂY</text>
+  <circle cx="438" cy="195" r="57" fill="#f6edc9"/>
+  <path d="M0 296Q106 249 219 286T428 273T600 301V800H0Z" fill="#a4b791"/>
+  <path d="M0 371Q130 318 267 356T600 345V800H0Z" fill="#789b80"/>
+  <path d="M318 339Q198 411 365 471T297 800H600V695Q550 562 464 505T386 351Z" fill="#c3d1be"/>
+  <path d="M338 364Q269 405 384 461M388 511Q455 537 472 580M383 646Q340 699 342 740" fill="none" stroke="#e7e7cb" stroke-width="3"/>
+  <path d="M0 455Q177 421 227 462T314 550L256 800H0Z" fill="#577c68"/>
+  <path d="M96 333H248V433H96Z" fill="#ebdfb7"/><path d="M73 337L172 271 269 337Z" fill="#a57551"/><path d="M173 279L258 337H89Z" fill="#bf9265"/>
+  <rect x="155" y="374" width="28" height="59" fill="#6d7554"/><rect x="111" y="366" width="25" height="32" fill="#8fa486"/><rect x="203" y="366" width="25" height="32" fill="#8fa486"/>
+  <g fill="#476f5a"><ellipse cx="64" cy="312" rx="31" ry="67"/><ellipse cx="284" cy="306" rx="27" ry="72"/><ellipse cx="32" cy="281" rx="24" ry="70"/></g><path d="M64 329V413M284 339V412M32 299V394" stroke="#536549" stroke-width="7"/>
+  <g transform="translate(425 537) rotate(14)"><path d="M-44 0H44L22 16H-26Z" fill="#9b7550"/><path d="M-33-2L21-37" stroke="#b99a6a" stroke-width="4"/><circle cx="0" cy="-21" r="7" fill="#516d56"/><path d="M-5-14L-11 0H9L6-14Z" fill="#516d56"/></g>
+  <rect y="588" width="600" height="212" fill="#e4e4cc"/>
+  <text x="300" y="641" text-anchor="middle" fill="#4f7159" font-family="Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="7">MÙA</text>
+  <text x="300" y="696" text-anchor="middle" fill="#4f7159" font-family="Arial,sans-serif" font-size="46" font-weight="700" letter-spacing="1">NƯỚC TRONG</text>
+  <path d="M257 722H343" stroke="#a5b39b"/>
+  <text x="300" y="749" text-anchor="middle" fill="#7e9479" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">GIA ĐÌNH · 100 PHÚT</text>
+</svg>

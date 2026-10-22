@@ -1,0 +1,5 @@
+<div class="admin-bar">
+  <div><span class="eyebrow">KHU VỰC QUẢN TRỊ</span><strong>Quản lý rạp phim</strong></div>
+  <nav aria-label="Điều hướng quản trị"><a href="/admin">Tổng quan</a><a href="/admin/movies/new">Thêm phim</a><a href="/admin/showtimes/new">Thêm suất chiếu</a></nav>
+  <form action="/admin/logout" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="button button-plain button-small" type="submit">Đăng xuất</button></form>
+</div>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-labelledby="title desc">
+  <title id="title">Bên Kia Bình Minh</title><desc id="desc">Áp phích minh họa một thị trấn ven biển và mặt trời đang lên, màu đất nung và kem.</desc>
+  <rect width="600" height="800" fill="#e9c6a1"/>
+  <rect x="23" y="23" width="554" height="754" rx="1" fill="none" stroke="#f7e5ca" stroke-width="1"/>
+  <text x="300" y="63" text-anchor="middle" fill="#764d38" font-family="Arial,sans-serif" font-size="10" letter-spacing="4">MỘT CÂU CHUYỆN TỪ RẠP MÂY</text>
+  <circle cx="346" cy="285" r="126" fill="#f9ead0"/>
+  <path d="M0 333Q145 295 255 357T600 334V550H0Z" fill="#a0a398"/>
+  <path d="M0 362Q150 325 300 384T600 365V557H0Z" fill="#798d82"/>
+  <path d="M0 422Q140 375 270 432T600 416V573H0Z" fill="#456f69"/>
+  <path d="M35 447H194M333 465H514M226 488H408M62 507H190M352 527H560" stroke="#bbc8b6" stroke-width="2" opacity=".55"/>
+  <path d="M0 403L83 364 148 390V584H0Z" fill="#b36b4d"/><path d="M0 403L83 364 83 584H0Z" fill="#c48962"/>
+  <path d="M105 416L167 384 223 417V584H105Z" fill="#ce9670"/><path d="M167 384V584H223V417Z" fill="#9f5e45"/>
+  <path d="M20 434H51V474H20ZM100 444H123V479H100ZM140 437H158V466H140ZM190 439H207V468H190Z" fill="#4f6258"/>
+  <path d="M600 409L545 380 502 405V584H600Z" fill="#ae6c4d"/><path d="M600 409L545 380V584H600Z" fill="#ca9163"/>
+  <path d="M489 449H600V466H474V483H600V500H459V517H600V534H444V551H600V584H415Z" fill="#e2b18a"/>
+  <path d="M0 558Q200 530 300 560T600 550V800H0Z" fill="#eee0c8"/>
+  <path d="M292 500L285 550H305L301 500Z" fill="#514c3c"/><circle cx="295" cy="489" r="10" fill="#514c3c"/>
+  <path d="M294 550L288 579M298 550L305 578M288 514L274 533" stroke="#514c3c" stroke-width="6" stroke-linecap="round"/>
+  <text x="300" y="641" text-anchor="middle" fill="#894d37" font-family="Arial,sans-serif" font-size="29" font-weight="700" letter-spacing="8">BÊN KIA</text>
+  <text x="300" y="697" text-anchor="middle" fill="#894d37" font-family="Arial,sans-serif" font-size="49" font-weight="700" letter-spacing="1">BÌNH MINH</text>
+  <path d="M257 725H343" stroke="#bca181"/>
+  <text x="300" y="749" text-anchor="middle" fill="#a18a6b" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">TÂM LÝ · 110 PHÚT</text>
+</svg>

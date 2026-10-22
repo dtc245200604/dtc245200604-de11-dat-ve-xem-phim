@@ -1,0 +1,26 @@
+<%- include('partials/header', {title: 'Chọn ghế · ' + showtime.title, active: 'schedule'}) %>
+<main id="noi-dung" class="container page-main">
+  <nav class="breadcrumb" aria-label="Đường dẫn"><a href="/">Trang chủ</a><span aria-hidden="true">/</span><a href="/movies/<%= showtime.movieId %>"><%= showtime.title %></a><span aria-hidden="true">/</span><span>Chọn ghế</span></nav>
+  <ol class="booking-steps" aria-label="Các bước đặt vé"><li class="is-current"><span>1</span> Chọn ghế</li><li><span>2</span> Thanh toán</li><li><span>3</span> Nhận vé</li></ol>
+  <div class="page-heading"><span class="eyebrow">TÌM MỘT GÓC NHÌN ĐẸP</span><h1>Chọn chỗ ngồi của bạn</h1><p><%= showtime.title %> <span aria-hidden="true">·</span> <%= formatDateTime(showtime.startsAt) %></p></div>
+  <form action="/bookings" method="post" id="seat-form" class="booking-layout" data-showtime-id="<%= showtime.id %>" data-seat-price="<%= showtime.price %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="showtimeId" value="<%= showtime.id %>"><input type="hidden" name="idempotencyKey" value="<%= idempotencyKey %>"><div id="selected-inputs" hidden></div>
+    <section class="panel seat-panel" aria-label="Sơ đồ ghế phòng chiếu 01">
+      <div class="seat-panel-top"><h2>Phòng chiếu 01</h2><span>2D · 48 ghế</span></div>
+      <div class="screen"><div></div><span>MÀN HÌNH</span></div>
+      <div class="seat-map" id="seat-map">
+        <% ['A','B','C','D','E','F'].forEach(function(row) { %><div class="seat-row"><span class="row-label" aria-hidden="true"><%= row %></span><% for (let n=1; n<=8; n++) { const code = row + n; const seat = seats.find(s => s.code === code); const state = seat ? seat.status : 'sold'; %><button type="button" class="seat <%= state !== 'available' ? 'seat-' + state : '' %>" data-seat="<%= code %>" data-status="<%= state %>" aria-label="Ghế <%= code %>, <%= state === 'available' ? 'còn trống' : state === 'sold' ? 'đã bán' : 'đang giữ' %>" aria-pressed="false" <%- state !== 'available' ? 'disabled' : '' %>><%= n %></button><% } %><span class="row-label" aria-hidden="true"><%= row %></span></div><% }); %>
+      </div>
+      <div class="seat-legend"><span><i class="legend-seat"></i> Còn trống</span><span><i class="legend-seat legend-selected"></i> Đang chọn</span><span><i class="legend-seat legend-held"></i> Đang giữ</span><span><i class="legend-seat legend-sold"></i> Đã bán</span></div>
+      <p class="seat-hint" id="seat-message" role="status" aria-live="polite">Chọn tối đa 8 ghế. Sơ đồ tự cập nhật mỗi 5 giây.</p><noscript><p class="notice notice-error">Vui lòng bật JavaScript để sử dụng sơ đồ chọn ghế.</p></noscript>
+    </section>
+    <aside class="panel order-summary">
+      <div class="summary-movie"><img src="/images/posters/<%= showtime.posterKey %>.svg" alt="" width="600" height="800"><div><span class="eyebrow">VÉ XEM PHIM</span><h2><%= showtime.title %></h2><p><%= showtime.genre %></p></div></div>
+      <dl class="summary-details"><div><dt>Suất chiếu</dt><dd><%= formatDateTime(showtime.startsAt) %></dd></div><div><dt>Phòng chiếu</dt><dd>Phòng 01 · 2D</dd></div><div><dt>Đơn giá</dt><dd><%= formatMoney(showtime.price) %> / ghế</dd></div><div><dt>Ghế đã chọn</dt><dd id="chosen-seats">Chưa chọn</dd></div></dl>
+      <div class="summary-total"><span>Tổng cộng</span><strong id="chosen-total">0 ₫</strong></div>
+      <fieldset class="customer-fields"><legend>Thông tin nhận vé</legend><label for="customer-name">Họ và tên</label><input id="customer-name" name="name" autocomplete="name" required minlength="2" maxlength="100" placeholder="Nhập họ và tên"><label for="customer-email">Email</label><input id="customer-email" name="email" type="email" autocomplete="email" required maxlength="160" placeholder="ban@example.com"><p>Vé được lưu trong phiên trình duyệt này. Hệ thống không gửi email.</p></fieldset>
+      <button class="button button-full" id="reserve-button" type="submit" disabled>Tiếp tục thanh toán <span aria-hidden="true">→</span></button><p class="summary-footnote">Giữ ghế tối đa <%= holdMinutes %> phút, kết thúc sớm nếu đến giờ chiếu.</p>
+    </aside>
+  </form>
+</main>
+<%- include('partials/footer', {scripts: ['/js/seats.js']}) %>

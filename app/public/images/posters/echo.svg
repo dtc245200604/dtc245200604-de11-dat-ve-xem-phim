@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-labelledby="title desc">
+  <title id="title">Tiếng Vọng Cuối Hẻm</title><desc id="desc">Áp phích một con hẻm yên tĩnh về đêm, khung cửa sáng và chiếc radio cũ, màu mận và vàng sẫm.</desc>
+  <rect width="600" height="800" fill="#493343"/>
+  <rect x="23" y="23" width="554" height="754" fill="none" stroke="#88666d"/>
+  <text x="300" y="63" text-anchor="middle" fill="#d1b79b" font-family="Arial,sans-serif" font-size="10" letter-spacing="4">MỘT CÂU CHUYỆN TỪ RẠP MÂY</text>
+  <circle cx="321" cy="205" r="66" fill="#dbbb82"/>
+  <path d="M0 170L173 236 173 530 0 610Z" fill="#754a52"/><path d="M600 152L425 235 425 532 600 610Z" fill="#654550"/>
+  <path d="M0 328L173 366M0 491L173 479M600 326L425 366M600 489L425 479" stroke="#4c3643" stroke-width="5"/>
+  <path d="M34 249L95 268V326L34 314Z" fill="#c79865"/><path d="M64 259V320M34 283L95 298" stroke="#67424b" stroke-width="5"/>
+  <path d="M468 281L530 258V316L468 332Z" fill="#ae7954"/><path d="M500 269V324M468 306L530 285" stroke="#533b48" stroke-width="5"/>
+  <path d="M40 411L91 414V467L40 470ZM467 411L525 409V466L467 463Z" fill="#3b303b"/>
+  <path d="M221 311H378V518H221Z" fill="#79585a"/><path d="M249 361H349V518H249Z" fill="#d4af73"/><path d="M249 361L298 387V518H249Z" fill="#b38258"/>
+  <path d="M173 530L249 518 349 518 425 532 600 610H0Z" fill="#9c6c5f"/>
+  <path d="M249 518L192 610M349 518L406 610" stroke="#bf926d" stroke-width="2"/>
+  <path d="M73 210Q305 308 520 207" fill="none" stroke="#332b35" stroke-width="3"/>
+  <path d="M286 261V282" stroke="#332b35" stroke-width="3"/><path d="M268 281H304L298 295H274Z" fill="#cfa46c"/>
+  <g transform="translate(300 507)"><rect x="-42" y="-34" width="84" height="53" rx="5" fill="#493740" stroke="#b88e69" stroke-width="2"/><rect x="-34" y="-26" width="40" height="38" rx="2" fill="#a98262"/><path d="M-29-19H1M-29-12H1M-29-5H1M-29 2H1" stroke="#62474a" stroke-width="2"/><circle cx="24" cy="-12" r="9" fill="#d8af79"/><path d="M19-27L9-62" stroke="#b88e69" stroke-width="2"/></g>
+  <rect y="610" width="600" height="190" fill="#493343"/>
+  <text x="300" y="654" text-anchor="middle" fill="#e5c699" font-family="Arial,sans-serif" font-size="31" font-weight="700" letter-spacing="5">TIẾNG VỌNG</text>
+  <text x="300" y="702" text-anchor="middle" fill="#e5c699" font-family="Arial,sans-serif" font-size="43" font-weight="700" letter-spacing="3">CUỐI HẺM</text>
+  <path d="M257 728H343" stroke="#906873"/>
+  <text x="300" y="752" text-anchor="middle" fill="#b79a86" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">BÍ ẨN · 115 PHÚT</text>
+</svg>

@@ -1,0 +1,217 @@
+name: de11datvewsl
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+x-app-environment: &app-environment
+  NODE_ENV: production
+  COOKIE_SECURE: auto
+  PORT: "3000"
+  DB_HOST: mysql
+  DB_PORT: "3306"
+  DB_NAME: cinema
+  DB_USER: cinema_app
+  DB_PASSWORD_FILE: /run/secrets/db_app_password
+  SESSION_SECRET_FILE: /run/secrets/session_secret
+  ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+  TZ: Asia/Ho_Chi_Minh
+services:
+  storage-init:
+    image: alpine:3.22.2
+    user: "0:0"
+    command: ["sh", "-c", "for f in access.log error.log; do if [ -L /logs/nginx/$$f ]; then unlink /logs/nginx/$$f; fi; done; touch /logs/mysql/error.log /logs/mysql/slow.log /logs/nginx/access.log /logs/nginx/error.log && chown 999:999 /data/mysql /logs/mysql /logs/mysql/*.log && chown 101:101 /logs/nginx /logs/nginx/*.log && chown 1000:1000 /logs/app && chmod 755 /logs/mysql /logs/nginx /logs/app && chmod 644 /logs/mysql/*.log /logs/nginx/*.log"]
+    network_mode: none
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - mysql_data:/data/mysql
+      - mysql_logs:/logs/mysql
+      - nginx_logs:/logs/nginx
+      - app_logs:/logs/app
+    logging: *logging
+  mysql:
+    build: ./infra/mysql
+    image: de11datvewsl-mysql:8.4.8
+    user: "999:999"
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: cinema
+      TZ: UTC
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+    secrets: [db_root_password, db_app_password, db_migrate_password, db_admin_password, db_exporter_password]
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_logs:/var/log/mysql
+    tmpfs:
+      - /tmp
+      - /var/run/mysqld:uid=999,gid=999,mode=0755
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$(cat /run/secrets/db_root_password) mysql -uroot --protocol=socket -Nse 'SELECT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    mem_limit: 1g
+    logging: *logging
+  migrate:
+    image: de11datvewsl-app:1.0.0
+    command: ["node", "src/migrate.js"]
+    user: "1000:1000"
+    environment:
+      <<: *app-environment
+      DB_USER: cinema_migrate
+      DB_PASSWORD_FILE: /run/secrets/db_migrate_password
+    secrets: [db_migrate_password, session_secret, admin_password]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [database]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+  app:
+    build: ./app
+    image: de11datvewsl-app:1.0.0
+    user: "1000:1000"
+    restart: unless-stopped
+    environment: *app-environment
+    secrets: [db_app_password, session_secret]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks: [frontend, database, monitoring]
+    volumes: [app_logs:/var/log/app]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    mem_limit: 384m
+    logging: *logging
+  nginx:
+    image: nginxinc/nginx-unprivileged:1.28.2-alpine
+    user: "101:101"
+    restart: unless-stopped
+    ports: ["127.0.0.1:8080:8080"]
+    volumes:
+      - ./infra/nginx:/etc/nginx/conf.d:ro
+      - type: volume
+        source: nginx_logs
+        target: /var/log/nginx
+        volume:
+          nocopy: true
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [frontend, monitoring, edge]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 128m
+    logging: *logging
+  phpmyadmin:
+    image: phpmyadmin:5.2.3-apache
+    restart: unless-stopped
+    ports: ["127.0.0.1:8081:80"]
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: "3306"
+      PMA_ARBITRARY: "0"
+      UPLOAD_LIMIT: 16M
+      HIDE_PHP_VERSION: "true"
+      APACHE_PORT: "80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [database, tools]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "php", "-d", "allow_url_fopen=1", "-r", "exit(@file_get_contents('http://127.0.0.1/')===false?1:0);"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    mem_limit: 384m
+    logging: *logging
+  logrotate:
+    build: ./infra/logrotate
+    image: de11datvewsl-logrotate:1.0.0
+    restart: unless-stopped
+    network_mode: none
+    volumes:
+      - nginx_logs:/logs/nginx
+      - mysql_logs:/logs/mysql
+      - logrotate_state:/var/lib/logrotate
+    cap_drop: [ALL]
+    cap_add: [DAC_OVERRIDE, FOWNER]
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+  tests:
+    profiles: [test]
+    image: de11datvewsl-app:1.0.0
+    command: ["node", "--test", "--test-concurrency=1", "test/unit.test.js", "test/integration.test.js", "test/proxy.test.js"]
+    environment:
+      <<: *app-environment
+      BASE_URL: http://nginx:8080
+      DB_USER: cinema_migrate
+      DB_PASSWORD_FILE: /run/secrets/db_migrate_password
+    secrets: [db_migrate_password, session_secret, admin_password]
+    networks: [frontend, database, monitoring]
+    depends_on:
+      nginx:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+networks:
+  frontend:
+    internal: true
+  database:
+    internal: true
+  monitoring:
+    internal: true
+  tools: {}
+  edge: {}
+volumes:
+  mysql_data: {}
+  mysql_logs: {}
+  nginx_logs: {}
+  app_logs: {}
+  logrotate_state: {}
+secrets:
+  db_root_password:
+    file: ./.local/secrets/db_root_password
+  db_app_password:
+    file: ./.local/secrets/db_app_password
+  db_migrate_password:
+    file: ./.local/secrets/db_migrate_password
+  db_admin_password:
+    file: ./.local/secrets/db_admin_password
+  db_exporter_password:
+    file: ./.local/secrets/db_exporter_password
+  admin_password:
+    file: ./.local/secrets/admin_password
+  session_secret:
+    file: ./.local/secrets/session_secret

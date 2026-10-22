@@ -1,0 +1,3 @@
+<%- include('partials/header', {title: 'Thông báo ' + status}) %>
+<main id="noi-dung" class="container page-main error-page"><span class="error-code"><%= status %></span><span class="eyebrow">CÓ MỘT CHÚT GIÁN ĐOẠN</span><h1><%= status === 404 ? 'Không tìm thấy trang này' : status === 409 ? 'Chưa thể hoàn tất thao tác' : status === 403 ? 'Không thể truy cập nội dung này' : status === 429 ? 'Bạn thao tác hơi nhanh' : 'Thao tác chưa thành công' %></h1><p><%= message %></p><div class="error-actions"><a class="button" href="/">Về trang chủ <span aria-hidden="true">→</span></a><a class="button button-outline" href="/history">Vé của tôi</a></div></main>
+<%- include('partials/footer') %>

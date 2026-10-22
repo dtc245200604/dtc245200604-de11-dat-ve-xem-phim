@@ -1,0 +1,25 @@
+<%- include('partials/header', {title: 'Thanh toán đơn ' + booking.code}) %>
+<% const stateLabels = {pending:'Chờ thanh toán',paid:'Đã thanh toán',failed:'Thanh toán thất bại',expired:'Đã hết hạn'}; %>
+<main id="noi-dung" class="container page-main">
+  <nav class="breadcrumb" aria-label="Đường dẫn"><a href="/">Trang chủ</a><span aria-hidden="true">/</span><a href="/history">Vé của tôi</a><span aria-hidden="true">/</span><span><%= booking.code %></span></nav>
+  <ol class="booking-steps" aria-label="Các bước đặt vé"><li class="is-complete"><span>✓</span> Chọn ghế</li><li class="is-current"><span>2</span> Thanh toán</li><li><span>3</span> Nhận vé</li></ol>
+  <div class="page-heading"><span class="eyebrow">SẮP ĐẾN GIỜ THƯỞNG PHIM</span><h1><%= booking.status === 'pending' ? 'Hoàn tất đặt vé' : 'Thông tin đơn đặt vé' %></h1><p>Mã đơn <strong><%= booking.code %></strong></p></div>
+  <div class="booking-layout checkout-layout">
+    <section class="panel checkout-panel">
+      <% if (booking.status === 'pending') { %>
+        <div class="hold-timer" id="hold-timer" data-seconds="<%= remainingSeconds %>"><div><span class="timer-icon" aria-hidden="true">◷</span><span>Ghế đang được giữ cho bạn</span></div><strong id="countdown" aria-label="Thời gian giữ ghế còn lại"><%= String(Math.floor(remainingSeconds/60)).padStart(2,'0') %>:<%= String(remainingSeconds%60).padStart(2,'0') %></strong></div>
+        <h2>Thanh toán giả lập</h2><p class="checkout-intro">Kiểm tra thông tin vé trước khi xác nhận. Đây là bước mô phỏng trong hệ thống thực hành, không phát sinh giao dịch hoặc thu tiền.</p>
+        <div class="payment-method"><span class="payment-symbol" aria-hidden="true">▣</span><div><strong>Cổng thanh toán mô phỏng</strong><p>Không cần nhập thông tin thẻ hoặc tài khoản ngân hàng.</p></div><span class="method-selected" aria-hidden="true">✓</span></div>
+        <form action="/bookings/<%= booking.id %>/pay" method="post" id="payment-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><div class="payment-actions"><button class="button button-full" type="submit" name="outcome" value="success">Xác nhận thanh toán <span aria-hidden="true">→</span></button><button class="button button-outline button-full" type="submit" name="outcome" value="fail">Mô phỏng thanh toán thất bại</button></div></form>
+        <div id="payment-expired" class="notice notice-error" role="status" hidden>Thời gian giữ ghế đã hết. Vui lòng chọn ghế và đặt lại.</div><a id="retry-booking" href="/showtimes/<%= booking.showtimeId %>/seats" class="text-link" hidden>Chọn ghế lại <span aria-hidden="true">→</span></a>
+        <p class="small-text muted payment-help">Khi thanh toán thất bại hoặc hết thời gian, ghế được mở lại để khách khác đặt.</p>
+      <% } else if (booking.status === 'paid') { %>
+        <div class="result-symbol result-success" aria-hidden="true">✓</div><h2>Vé của bạn đã sẵn sàng</h2><p class="checkout-intro">Đơn đặt vé đã thanh toán thành công. Bạn có thể xem vé và lưu lại mã đặt vé của mình.</p><a class="button" href="/bookings/<%= booking.id %>/ticket">Xem vé của tôi <span aria-hidden="true">→</span></a>
+      <% } else { %>
+        <div class="result-symbol result-failed" aria-hidden="true">×</div><h2><%= booking.status === 'expired' ? 'Đơn đặt vé đã hết hạn' : 'Thanh toán chưa thành công' %></h2><p class="checkout-intro"><%= booking.status === 'expired' ? 'Thời gian giữ ghế đã kết thúc. Các ghế trong đơn đã được mở lại.' : 'Kết quả thanh toán mô phỏng là thất bại. Đơn này không có vé hợp lệ và các ghế đã được mở lại.' %></p><a class="button" href="/showtimes/<%= booking.showtimeId %>/seats">Chọn ghế và đặt lại <span aria-hidden="true">→</span></a>
+      <% } %>
+    </section>
+    <aside class="panel order-summary"><span class="eyebrow">CHI TIẾT ĐẶT VÉ</span><h2 class="summary-film-title"><%= booking.title %></h2><span class="status-badge status-<%= booking.status %>"><%= stateLabels[booking.status] || booking.status %></span><dl class="summary-details"><div><dt>Suất chiếu</dt><dd><%= formatDateTime(booking.startsAt) %></dd></div><div><dt>Phòng chiếu</dt><dd>Phòng 01 · 2D</dd></div><div><dt>Ghế</dt><dd><%= items.map(item => item.seatCode).join(', ') %></dd></div><div><dt>Số lượng</dt><dd><%= items.length %> vé</dd></div><div><dt>Người đặt</dt><dd><%= booking.name %></dd></div><div><dt>Email</dt><dd class="break-text"><%= booking.email %></dd></div></dl><div class="summary-total"><span>Tổng cộng</span><strong><%= formatMoney(booking.total) %></strong></div><a class="text-link" href="/history">Xem lịch sử đặt vé <span aria-hidden="true">→</span></a></aside>
+  </div>
+</main>
+<%- include('partials/footer', {scripts: ['/js/booking.js']}) %>

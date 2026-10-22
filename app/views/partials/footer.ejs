@@ -1,0 +1,10 @@
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><a class="footer-brand" href="/"><%= siteName %></a><p>Hẹn bạn ở một câu chuyện mới.</p></div>
+      <div class="footer-links"><a href="/history">Vé của tôi</a><a href="/admin"><%= admin ? 'Trang quản trị' : 'Quản trị viên' %></a></div>
+      <p class="footer-note">Hệ thống thực hành đặt vé.<br>Thanh toán được mô phỏng, không thu tiền.</p>
+    </div>
+  </footer>
+  <% if (typeof scripts !== 'undefined') { scripts.forEach(function(script) { %><script src="<%= script %>" defer></script><% }); } %>
+</body>
+</html>
